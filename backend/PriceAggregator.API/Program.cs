@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
+using PriceAggregator.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
 builder.Services.AddSwaggerGen(c =>
 {
     var securityScheme = new OpenApiSecurityScheme
@@ -31,6 +33,8 @@ builder.Services.AddSwaggerGen(c =>
     };
     c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
 });
+
+builder.Services.AddApiServices();
 
 var app = builder.Build();
 

@@ -1,15 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PriceAggregator.API.Models;
+using PriceAggregator.API.Models.Dtos;
+using PriceAggregator.API.Services.Abstractions;
 
 namespace PriceAggregator.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PriceController : ControllerBase
+public class PriceController(
+    IPriceService priceService) : ControllerBase
 {
+    private readonly IPriceService _priceService = priceService;
+
     [HttpGet]
-    public async Task<ActionResult<PriceDto>> GetAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<PriceDto>> GetAsync(DateTime date, CancellationToken cancellationToken)
     {
-        return Ok();
+        var result = await _priceService.GetPriceAsync(date, cancellationToken);
+        return Ok(result);
     }
 }
