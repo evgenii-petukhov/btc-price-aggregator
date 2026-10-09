@@ -76,6 +76,55 @@ public class UnixTimeRangeCalculatorTests
         end.Should().Be(ToMs(new DateTime(2026, 1, 1, 23, 59, 59, 999, DateTimeKind.Utc)));
     }
 
+    [Test]
+    public void GetDayStartInSeconds_MidDayUtc_ReturnsSameDayStart()
+    {
+        var date = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc);
+
+        var result = _service.GetDayStartInSeconds(date);
+
+        result.Should().Be(new DateTimeOffset(2026, 9, 8, 0, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds());
+    }
+
+    [TestCase(0, 0, 0)]
+    [TestCase(23, 59, 59)]
+    public void GetDayStartInSeconds_AnyTimeOfSameDay_ReturnsSameValue(int hour, int minute, int second)
+    {
+        var reference = _service.GetDayStartInSeconds(new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc));
+
+        var result = _service.GetDayStartInSeconds(new DateTime(2026, 9, 8, hour, minute, second, DateTimeKind.Utc));
+
+        result.Should().Be(reference);
+    }
+
+    [Test]
+    public void GetDayStartInSeconds_UnspecifiedKind_IsTreatedAsUtc()
+    {
+        var unspecified = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Unspecified);
+        var utc = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc);
+
+        _service.GetDayStartInSeconds(unspecified).Should().Be(_service.GetDayStartInSeconds(utc));
+    }
+
+    [Test]
+    public void GetDayStartInSeconds_LocalKind_IsConvertedToUtcBeforeCalculation()
+    {
+        var local = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Local);
+        var expected = _service.GetDayStartInSeconds(local.ToUniversalTime());
+
+        _service.GetDayStartInSeconds(local).Should().Be(expected);
+    }
+
+    [Test]
+    public void GetDayStartInSeconds_FirstDayOfYear_ReturnsJanuaryFirstStart()
+    {
+        var date = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+
+        var result = _service.GetDayStartInSeconds(date);
+
+        result.Should().Be(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds());
+    }
+
     private static long ToMs(DateTime utc)
     {
         return new DateTimeOffset(utc).ToUnixTimeMilliseconds();

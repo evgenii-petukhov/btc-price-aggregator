@@ -8,14 +8,24 @@ public class UnixTimeRangeCalculator : IUnixTimeRangeCalculator
 
     public (long Start, long End) GetRange(DateTime date)
     {
-        var utc = date.Kind == DateTimeKind.Unspecified
-            ? DateTime.SpecifyKind(date, DateTimeKind.Utc)
-            : date.ToUniversalTime();
+        var utc = ToUtc(date);
 
         var start = utc.Date.AddDays(-1);
         var end = utc.Date.AddDays(1).AddMilliseconds(-1);
 
         return (GetUnixTimestampMs(start), GetUnixTimestampMs(end));
+    }
+
+    public long GetDayStartInSeconds(DateTime date)
+    {
+        return (long)(ToUtc(date).Date - Origin).TotalSeconds;
+    }
+
+    private static DateTime ToUtc(DateTime date)
+    {
+        return date.Kind == DateTimeKind.Unspecified
+            ? DateTime.SpecifyKind(date, DateTimeKind.Utc)
+            : date.ToUniversalTime();
     }
 
     private static long GetUnixTimestampMs(DateTime dateUtc)

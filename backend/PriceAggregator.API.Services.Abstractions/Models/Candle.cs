@@ -1,6 +1,6 @@
 namespace PriceAggregator.API.Services.Abstractions.Models;
 
-public class BitfinexResponse
+public class Candle
 {
     public long UnitTimeStart { get; set; }
 

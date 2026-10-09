@@ -10,7 +10,14 @@ public static class ApiServicesRegistration
     {
         services.AddScoped<IPriceService, PriceService>();
         services.AddScoped<IBitfinexService, BitfinexService>();
+        services.AddScoped<IBitstampService, BitstampService>();
         services.AddSingleton<IUnixTimeRangeCalculator, UnixTimeRangeCalculator>();
+        services.AddHttpClient(
+            nameof(BitstampService),
+            client =>
+            {
+                client.BaseAddress = new Uri("https://www.bitstamp.net/");
+            });
         services.AddHttpClient(
             nameof(BitfinexService),
             client =>
