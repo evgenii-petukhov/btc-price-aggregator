@@ -6,9 +6,7 @@ public class PriceDto
 
     public bool IsCached { get; set; }
 
-    public decimal AvgPrice { get; set; }
+    public decimal BitstampPrice { get; set; }
 
-    public decimal Bitstamp { get; set; }
-
-    public decimal Bitfinex { get; set; }
+    public decimal BitfinexPrice { get; set; }
 }
