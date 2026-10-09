@@ -15,36 +15,46 @@ public class UnixTimeRangeCalculatorTests
     }
 
     [Test]
-    public void GetRange_MidDayUtc_ReturnsPreviousDayStartAndGivenDayEnd()
+    public void GetRange_HourStart_ReturnsStartAndInclusiveEndOfThatHour()
     {
-        var date = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc);
+        var date = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         var (start, end) = _service.GetRange(date);
 
-        start.Should().Be(ToMs(new DateTime(2026, 9, 7, 0, 0, 0, DateTimeKind.Utc)));
-        end.Should().Be(ToMs(new DateTime(2026, 9, 8, 23, 59, 59, 999, DateTimeKind.Utc)));
+        start.Should().Be(1672531200000);
+        end.Should().Be(1672534799999);
     }
 
     [Test]
-    public void GetRange_KnownDate_MatchesExpectedConstants()
+    public void GetRange_MinutesAndSeconds_AreTruncatedToHour()
     {
-        var date = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc);
+        var date = new DateTime(2026, 9, 8, 10, 45, 30, DateTimeKind.Utc);
 
         var (start, end) = _service.GetRange(date);
 
-        start.Should().Be(1788739200000);
-        end.Should().Be(1788911999999);
+        start.Should().Be(ToMs(new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc)));
+        end.Should().Be(ToMs(new DateTime(2026, 9, 8, 10, 59, 59, 999, DateTimeKind.Utc)));
     }
 
-    [TestCase(0, 0, 0)]
-    [TestCase(23, 59, 59)]
-    public void GetRange_AnyTimeOfSameDay_ReturnsSameRange(int hour, int minute, int second)
+    [TestCase(0, 0)]
+    [TestCase(59, 59)]
+    public void GetRange_AnyTimeWithinSameHour_ReturnsSameRange(int minute, int second)
     {
         var reference = _service.GetRange(new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc));
 
-        var result = _service.GetRange(new DateTime(2026, 9, 8, hour, minute, second, DateTimeKind.Utc));
+        var result = _service.GetRange(new DateTime(2026, 9, 8, 10, minute, second, DateTimeKind.Utc));
 
         result.Should().Be(reference);
+    }
+
+    [Test]
+    public void GetRange_NextHour_ShiftsByOneHour()
+    {
+        var first = _service.GetRange(new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc));
+        var second = _service.GetRange(new DateTime(2026, 9, 8, 11, 0, 0, DateTimeKind.Utc));
+
+        (second.Start - first.Start).Should().Be(3_600_000);
+        (second.End - first.End).Should().Be(3_600_000);
     }
 
     [Test]
@@ -59,70 +69,87 @@ public class UnixTimeRangeCalculatorTests
     [Test]
     public void GetRange_LocalKind_IsConvertedToUtcBeforeCalculation()
     {
-        var local = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Local);
+        var local = new DateTime(2026, 9, 8, 10, 15, 0, DateTimeKind.Local);
         var expected = _service.GetRange(local.ToUniversalTime());
 
         _service.GetRange(local).Should().Be(expected);
     }
 
     [Test]
-    public void GetRange_FirstDayOfYear_StartsOnLastDayOfPreviousYear()
+    public void GetRange_LastHourOfYear_EndsOnYearBoundary()
     {
-        var date = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        var date = new DateTime(2025, 12, 31, 23, 30, 0, DateTimeKind.Utc);
 
         var (start, end) = _service.GetRange(date);
 
-        start.Should().Be(ToMs(new DateTime(2025, 12, 31, 0, 0, 0, DateTimeKind.Utc)));
-        end.Should().Be(ToMs(new DateTime(2026, 1, 1, 23, 59, 59, 999, DateTimeKind.Utc)));
+        start.Should().Be(ToMs(new DateTime(2025, 12, 31, 23, 0, 0, DateTimeKind.Utc)));
+        end.Should().Be(ToMs(new DateTime(2025, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc)));
     }
 
     [Test]
-    public void GetDayStartInSeconds_MidDayUtc_ReturnsSameDayStart()
+    public void GetHourStartInSeconds_HourStart_ReturnsUnixSeconds()
     {
-        var date = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc);
+        var date = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        var result = _service.GetDayStartInSeconds(date);
-
-        result.Should().Be(new DateTimeOffset(2026, 9, 8, 0, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds());
+        _service.GetHourStartInSeconds(date).Should().Be(1672531200);
     }
 
-    [TestCase(0, 0, 0)]
-    [TestCase(23, 59, 59)]
-    public void GetDayStartInSeconds_AnyTimeOfSameDay_ReturnsSameValue(int hour, int minute, int second)
+    [Test]
+    public void GetHourStartInSeconds_MinutesAndSeconds_AreTruncatedToHour()
     {
-        var reference = _service.GetDayStartInSeconds(new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc));
+        var date = new DateTime(2026, 9, 8, 10, 45, 30, DateTimeKind.Utc);
 
-        var result = _service.GetDayStartInSeconds(new DateTime(2026, 9, 8, hour, minute, second, DateTimeKind.Utc));
+        var result = _service.GetHourStartInSeconds(date);
+
+        result.Should().Be(new DateTimeOffset(2026, 9, 8, 10, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds());
+    }
+
+    [TestCase(0, 0)]
+    [TestCase(59, 59)]
+    public void GetHourStartInSeconds_AnyTimeWithinSameHour_ReturnsSameValue(int minute, int second)
+    {
+        var reference = _service.GetHourStartInSeconds(new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc));
+
+        var result = _service.GetHourStartInSeconds(new DateTime(2026, 9, 8, 10, minute, second, DateTimeKind.Utc));
 
         result.Should().Be(reference);
     }
 
     [Test]
-    public void GetDayStartInSeconds_UnspecifiedKind_IsTreatedAsUtc()
+    public void GetHourStartInSeconds_NextHour_ShiftsByOneHour()
+    {
+        var first = _service.GetHourStartInSeconds(new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc));
+        var second = _service.GetHourStartInSeconds(new DateTime(2026, 9, 8, 11, 0, 0, DateTimeKind.Utc));
+
+        (second - first).Should().Be(3600);
+    }
+
+    [Test]
+    public void GetHourStartInSeconds_UnspecifiedKind_IsTreatedAsUtc()
     {
         var unspecified = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Unspecified);
         var utc = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Utc);
 
-        _service.GetDayStartInSeconds(unspecified).Should().Be(_service.GetDayStartInSeconds(utc));
+        _service.GetHourStartInSeconds(unspecified).Should().Be(_service.GetHourStartInSeconds(utc));
     }
 
     [Test]
-    public void GetDayStartInSeconds_LocalKind_IsConvertedToUtcBeforeCalculation()
+    public void GetHourStartInSeconds_LocalKind_IsConvertedToUtcBeforeCalculation()
     {
-        var local = new DateTime(2026, 9, 8, 10, 0, 0, DateTimeKind.Local);
-        var expected = _service.GetDayStartInSeconds(local.ToUniversalTime());
+        var local = new DateTime(2026, 9, 8, 10, 15, 0, DateTimeKind.Local);
+        var expected = _service.GetHourStartInSeconds(local.ToUniversalTime());
 
-        _service.GetDayStartInSeconds(local).Should().Be(expected);
+        _service.GetHourStartInSeconds(local).Should().Be(expected);
     }
 
     [Test]
-    public void GetDayStartInSeconds_FirstDayOfYear_ReturnsJanuaryFirstStart()
+    public void GetHourStartInSeconds_LastHourOfYear_TruncatesWithinSameDay()
     {
-        var date = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        var date = new DateTime(2025, 12, 31, 23, 30, 0, DateTimeKind.Utc);
 
-        var result = _service.GetDayStartInSeconds(date);
+        var result = _service.GetHourStartInSeconds(date);
 
-        result.Should().Be(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds());
+        result.Should().Be(new DateTimeOffset(2025, 12, 31, 23, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds());
     }
 
     private static long ToMs(DateTime utc)

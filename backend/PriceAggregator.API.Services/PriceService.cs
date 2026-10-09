@@ -15,11 +15,18 @@ public class PriceService(
     public async Task<PriceDto> GetPriceAsync(DateTime date, CancellationToken cancellationToken)
     {
         var (start, end) = _unixTimeRangeCalculator.GetRange(date);
-        var bitstampStart = _unixTimeRangeCalculator.GetDayStartInSeconds(date);
+        var bitstampStart = _unixTimeRangeCalculator.GetHourStartInSeconds(date);
 
-        var bitfinexResponse = await _bitfinexService.GetPriceAsync(start, end, cancellationToken);
-        var bitstampResponse = await _bitstampService.GetPriceAsync(bitstampStart, cancellationToken);
+        var bitfinexResponse = _bitfinexService.GetPriceAsync(start, end, cancellationToken);
+        var bitstampResponse = _bitstampService.GetPriceAsync(bitstampStart, cancellationToken);
 
-        return new PriceDto();
+        await Task.WhenAll(bitfinexResponse, bitstampResponse);
+
+        return new PriceDto
+        {
+            BitfinexPrice = bitfinexResponse.Result.PriceClose,
+            BitstampPrice = bitstampResponse.Result.PriceClose,
+            Date = DateTime.UnixEpoch.AddSeconds(bitstampStart)
+        };
     }
 }

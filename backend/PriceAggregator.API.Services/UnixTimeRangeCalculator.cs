@@ -4,21 +4,20 @@ namespace PriceAggregator.API.Services;
 
 public class UnixTimeRangeCalculator : IUnixTimeRangeCalculator
 {
+    private const long HourInMilliseconds = 3_600_000;
+
     private static readonly DateTime Origin = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
     public (long Start, long End) GetRange(DateTime date)
     {
-        var utc = ToUtc(date);
+        var start = GetUnixTimestampMs(TruncateToHour(ToUtc(date)));
 
-        var start = utc.Date.AddDays(-1);
-        var end = utc.Date.AddDays(1).AddMilliseconds(-1);
-
-        return (GetUnixTimestampMs(start), GetUnixTimestampMs(end));
+        return (start, start + HourInMilliseconds - 1);
     }
 
-    public long GetDayStartInSeconds(DateTime date)
+    public long GetHourStartInSeconds(DateTime date)
     {
-        return (long)(ToUtc(date).Date - Origin).TotalSeconds;
+        return (long)(TruncateToHour(ToUtc(date)) - Origin).TotalSeconds;
     }
 
     private static DateTime ToUtc(DateTime date)
@@ -26,6 +25,11 @@ public class UnixTimeRangeCalculator : IUnixTimeRangeCalculator
         return date.Kind == DateTimeKind.Unspecified
             ? DateTime.SpecifyKind(date, DateTimeKind.Utc)
             : date.ToUniversalTime();
+    }
+
+    private static DateTime TruncateToHour(DateTime utc)
+    {
+        return utc.Date.AddHours(utc.Hour);
     }
 
     private static long GetUnixTimestampMs(DateTime dateUtc)

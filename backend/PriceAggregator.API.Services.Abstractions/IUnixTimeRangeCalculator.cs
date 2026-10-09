@@ -4,5 +4,5 @@ public interface IUnixTimeRangeCalculator
 {
     (long Start, long End) GetRange(DateTime date);
 
-    long GetDayStartInSeconds(DateTime date);
+    long GetHourStartInSeconds(DateTime date);
 }
