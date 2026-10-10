@@ -42,6 +42,7 @@ public class CandleProvider(
 
             results[sourceType] = new CandleDto
             {
+                SourceType = sourceType,
                 UnitTimeStart = unixTimeStart,
                 PriceOpen = candleEntity.PriceOpen,
                 PriceClose = candleEntity.PriceClose,
@@ -62,6 +63,11 @@ public class CandleProvider(
                 var sourceType = missing[i];
                 var candleResponse = responses[i];
 
+                if (candleResponse == null)
+                {
+                    continue;
+                }
+
                 await _repository.AddAsync(
                     unixTimeStart,
                     unixTimeEnd,
@@ -73,13 +79,13 @@ public class CandleProvider(
                     candleResponse.PriceLow,
                     candleResponse.Volume);
 
-                results[sourceType] = Map(unixTimeStart, candleResponse);
+                results[sourceType] = Map(sourceType, unixTimeStart, candleResponse);
             }
 
             await _unitOfWork.SaveAsync(cancellationToken);
         }
 
-        return [.. sourceTypes.Select(sourceType => results[sourceType])];
+        return [.. sourceTypes.Where(results.ContainsKey).Select(sourceType => results[sourceType])];
     }
 
     private IRequestService ResolveRequestService(SourceType sourceType)
@@ -88,10 +94,11 @@ public class CandleProvider(
             ?? throw new InvalidOperationException($"No request service registered for source '{sourceType}'.");
     }
 
-    private static CandleDto Map(long unixTimeStart, CandleResponse candleResponse)
+    private static CandleDto Map(SourceType sourceType, long unixTimeStart, CandleResponse candleResponse)
     {
         return new CandleDto
         {
+            SourceType = sourceType,
             UnitTimeStart = unixTimeStart,
             PriceOpen = candleResponse.PriceOpen,
             PriceClose = candleResponse.PriceClose,

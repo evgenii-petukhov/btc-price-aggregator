@@ -7,7 +7,7 @@ public interface IRequestService
 {
     SourceType SourceType { get; }
 
-    Task<CandleResponse> GetPriceAsync(
+    Task<CandleResponse?> GetPriceAsync(
         InstrumentType instrumentType,
         long unixTimeStart,
         long unixTimeEnd,

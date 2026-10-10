@@ -42,6 +42,7 @@ npm start          # http://localhost:4200
 - The timestamp entered in the UI is interpreted as UTC.
 - The aggregated price is the average of the source prices. The backend returns only per-source prices, so the average is computed in the frontend.
 - "Result source" is *Cache / datastore* only if every source was already stored. If at least one source had to be fetched, it shows *External APIs*.
+- If no source has data for the requested hour (for example a date before the exchanges' history, or an hour that hasn't happened yet), the API responds with `200` and an empty `prices` array, and the UI shows *n/a*. If only some sources have data, only those are returned. Empty results are not stored, so such requests always go to the exchange APIs.
 - Supported instruments are `BtcUsd` and `EthUsd`; supported sources are Bitstamp and Bitfinex.
 - No authentication is required, and the backend allows CORS from any origin (suitable for local development only).
 - The backend does not retry failed exchange calls: if an exchange is unavailable, the request fails and the UI shows the error.

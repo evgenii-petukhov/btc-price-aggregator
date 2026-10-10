@@ -26,12 +26,12 @@ public class PriceSummaryService(
         {
             Instrument = instrumentType.ToString().ToUpperInvariant(),
             Date = DateTime.UnixEpoch.AddSeconds(start / 1000),
-            Prices = candles.Select((candle, index) => new PriceItemDto
+            Prices = candles.Select(candle => new PriceItemDto
             {
                 Price = candle.PriceClose,
-                SourceName = sourceTypes[index].ToString()
+                SourceName = candle.SourceType.ToString()
             }),
-            IsCached = candles.All(c => c.IsCached),
+            IsCached = candles.Count > 0 && candles.All(c => c.IsCached),
         };
     }
 }

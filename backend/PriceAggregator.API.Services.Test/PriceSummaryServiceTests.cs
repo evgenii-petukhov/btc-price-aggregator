@@ -50,8 +50,8 @@ public class PriceSummaryServiceTests
     {
         // Arrange
         SetupCandles(
-            new CandleDto { PriceClose = 16531.00m },
-            new CandleDto { PriceClose = 16529.50m });
+            new CandleDto { SourceType = SourceType.Bitstamp, PriceClose = 16531.00m },
+            new CandleDto { SourceType = SourceType.Bitfinex, PriceClose = 16529.50m });
 
         // Act
         var result = await _service.GetSummaryAsync(
@@ -98,6 +98,36 @@ public class PriceSummaryServiceTests
 
         // Assert
         result.IsCached.Should().BeFalse();
+    }
+
+    [Test]
+    public async Task GetSummaryAsync_NoCandles_ReturnsEmptyPricesAndNotCached()
+    {
+        // Arrange
+        SetupCandles();
+
+        // Act
+        var result = await _service.GetSummaryAsync(
+            new DateTime(1995, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            InstrumentType.BtcUsd,
+            CancellationToken.None);
+
+        // Assert
+        result.Prices.Should().BeEmpty();
+        result.IsCached.Should().BeFalse();
+    }
+
+    [Test]
+    public async Task GetSummaryAsync_OneSourceMissing_NamesPriceBySourceNotPosition()
+    {
+        // Arrange
+        SetupCandles(new CandleDto { SourceType = SourceType.Bitfinex, PriceClose = 42m });
+
+        // Act
+        var result = await _service.GetSummaryAsync(DateTime.UtcNow, InstrumentType.BtcUsd, CancellationToken.None);
+
+        // Assert
+        result.Prices.Should().BeEquivalentTo([new PriceItemDto { SourceName = "Bitfinex", Price = 42m }]);
     }
 
     [Test]

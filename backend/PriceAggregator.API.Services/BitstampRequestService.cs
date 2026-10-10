@@ -14,7 +14,7 @@ public class BitstampRequestService(
 
     public SourceType SourceType { get; } = SourceType.Bitstamp;
 
-    public async Task<CandleResponse> GetPriceAsync(
+    public async Task<CandleResponse?> GetPriceAsync(
         InstrumentType instrumentType,
         long unixTimeStart,
         long unixTimeEnd,
@@ -29,9 +29,10 @@ public class BitstampRequestService(
 
         var body = await response.Content.ReadFromJsonAsync<OhlcResponse>(cancellationToken);
         var candle = body?.Data?.Ohlc?.FirstOrDefault();
-        if (candle == null)
+
+        if (candle == null || long.Parse(candle.Timestamp, CultureInfo.InvariantCulture) * 1000 != unixTimeStart)
         {
-            throw new InvalidOperationException("No candle data");
+            return null;
         }
 
         return Map(candle);

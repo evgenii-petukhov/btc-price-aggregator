@@ -95,6 +95,43 @@ public class CandleProviderTests
     }
 
     [Test]
+    public async Task GetCandlesAsync_SourceHasNoData_OmitsItAndDoesNotStoreIt()
+    {
+        // Arrange
+        SetupStored(SourceType.Bitstamp, null);
+        SetupStored(SourceType.Bitfinex, null);
+        SetupRemote(SourceType.Bitstamp, null);
+        SetupRemote(SourceType.Bitfinex, Remote(200));
+
+        // Act
+        var result = await _provider.GetCandlesAsync(InstrumentType.BtcUsd, Start, End, Sources);
+
+        // Assert
+        result.Should().ContainSingle().Which.SourceType.Should().Be(SourceType.Bitfinex);
+        _repository.Verify(r => r.AddAsync(
+            It.IsAny<long>(), It.IsAny<long>(), SourceType.Bitstamp, It.IsAny<InstrumentType>(),
+            It.IsAny<decimal>(), It.IsAny<decimal>(), It.IsAny<decimal>(), It.IsAny<decimal>(), It.IsAny<decimal>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task GetCandlesAsync_NoSourceHasData_ReturnsEmpty()
+    {
+        // Arrange
+        SetupStored(SourceType.Bitstamp, null);
+        SetupStored(SourceType.Bitfinex, null);
+        SetupRemote(SourceType.Bitstamp, null);
+        SetupRemote(SourceType.Bitfinex, null);
+
+        // Act
+        var result = await _provider.GetCandlesAsync(InstrumentType.BtcUsd, Start, End, Sources);
+
+        // Assert
+        result.Should().BeEmpty();
+        VerifyNothingAdded();
+    }
+
+    [Test]
     public async Task GetCandlesAsync_OrderFollowsRequestedSourcesNotStorage()
     {
         // Arrange
@@ -147,7 +184,7 @@ public class CandleProviderTests
             .ReturnsAsync(candle);
     }
 
-    private void SetupRemote(SourceType source, CandleResponse response)
+    private void SetupRemote(SourceType source, CandleResponse? response)
     {
         var service = new Mock<IRequestService>();
         service

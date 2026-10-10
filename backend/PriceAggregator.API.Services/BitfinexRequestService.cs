@@ -13,7 +13,7 @@ public class BitfinexRequestService(
 
     public SourceType SourceType { get; } = SourceType.Bitfinex;
 
-    public async Task<CandleResponse> GetPriceAsync(
+    public async Task<CandleResponse?> GetPriceAsync(
         InstrumentType instrumentType,
         long unixTimeStart,
         long unixTimeEnd,
@@ -29,7 +29,7 @@ public class BitfinexRequestService(
         var candles = await response.Content.ReadFromJsonAsync<JsonElement[][]>(cancellationToken);
         if (candles == null || candles.Length == 0)
         {
-            throw new InvalidOperationException("No candle data");
+            return null;
         }
 
         return Map(candles[0]);
