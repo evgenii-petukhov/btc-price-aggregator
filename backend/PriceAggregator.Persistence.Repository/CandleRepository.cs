@@ -13,10 +13,14 @@ public class CandleRepository(PricesDbContext context) : ICandleRepository
         long startUnixTime,
         long endUnixTime,
         SourceType sourceType,
+        InstrumentType instrumentType,
         CancellationToken cancellationToken = default)
     {
         return _context.Candles.FirstOrDefaultAsync(
-            c => c.StartUnixTime == startUnixTime && c.EndUnixTime == endUnixTime && c.SourceType == sourceType,
+            c => c.StartUnixTime == startUnixTime
+                && c.EndUnixTime == endUnixTime
+                && c.SourceType == sourceType
+                && c.InstrumentType == instrumentType,
             cancellationToken: cancellationToken);
     }
 
@@ -24,6 +28,7 @@ public class CandleRepository(PricesDbContext context) : ICandleRepository
         long startUnixTime,
         long endUnixTime,
         SourceType sourceType,
+        InstrumentType instrumentType,
         decimal priceOpen,
         decimal priceClose,
         decimal priceHigh,
@@ -35,6 +40,7 @@ public class CandleRepository(PricesDbContext context) : ICandleRepository
             StartUnixTime = startUnixTime,
             EndUnixTime = endUnixTime,
             SourceType = sourceType,
+            InstrumentType = instrumentType,
             PriceOpen = priceOpen,
             PriceClose = priceClose,
             PriceHigh = priceHigh,

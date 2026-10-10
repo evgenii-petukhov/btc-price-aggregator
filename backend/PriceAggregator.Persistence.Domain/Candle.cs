@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace PriceAggregator.Persistence.Domain;
 
 [Table("candle")]
-[PrimaryKey(nameof(StartUnixTime), nameof(EndUnixTime), nameof(SourceType))]
+[PrimaryKey(nameof(StartUnixTime), nameof(EndUnixTime), nameof(SourceType), nameof(InstrumentType))]
 public class Candle
 {
     public long StartUnixTime {  get; set; }
@@ -13,6 +13,8 @@ public class Candle
     public long EndUnixTime { get; set; }
 
     public SourceType SourceType { get; set; }
+
+    public InstrumentType InstrumentType { get; set; }
 
     public decimal PriceOpen { get; set; }
 

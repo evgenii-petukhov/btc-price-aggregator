@@ -13,16 +13,18 @@ public class PriceSummaryService(
 
     public async Task<PriceSummaryDto> GetSummaryAsync(
         DateTime date,
+        InstrumentType instrumentType,
         CancellationToken cancellationToken)
     {
         var (start, end) = _unixTimeRangeCalculator.GetRange(date);
 
         var sourceTypes = Enum.GetValues<SourceType>();
 
-        var candles = await _candleProvider.GetCandlesAsync(start, end, sourceTypes, cancellationToken);
+        var candles = await _candleProvider.GetCandlesAsync(instrumentType, start, end, sourceTypes, cancellationToken);
 
         return new PriceSummaryDto
         {
+            Instrument = instrumentType.ToString().ToUpperInvariant(),
             Date = DateTime.UnixEpoch.AddSeconds(start / 1000),
             Prices = candles.Select((candle, index) => new PriceItemDto
             {

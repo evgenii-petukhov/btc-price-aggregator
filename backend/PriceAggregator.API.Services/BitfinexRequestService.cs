@@ -14,13 +14,14 @@ public class BitfinexRequestService(
     public SourceType SourceType { get; } = SourceType.Bitfinex;
 
     public async Task<CandleResponse> GetPriceAsync(
+        InstrumentType instrumentType,
         long unixTimeStart,
         long unixTimeEnd,
         CancellationToken cancellationToken)
     {
         using var client = _httpClientFactory.CreateClient(nameof(BitfinexRequestService));
 
-        var url = $"v2/candles/trade:1h:tBTCUSD/hist?start={unixTimeStart}&end={unixTimeEnd}&limit=1&sort=1";
+        var url = $"v2/candles/trade:1h:{GetSymbol(instrumentType)}/hist?start={unixTimeStart}&end={unixTimeEnd}&limit=1&sort=1";
 
         using var response = await client.GetAsync(url, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -32,6 +33,16 @@ public class BitfinexRequestService(
         }
 
         return Map(candles[0]);
+    }
+
+    private static string GetSymbol(InstrumentType instrumentType)
+    {
+        return instrumentType switch
+        {
+            InstrumentType.BtcUsd => "tBTCUSD",
+            InstrumentType.EthUsd => "tETHUSD",
+            _ => throw new NotSupportedException($"Instrument '{instrumentType}' is not supported by Bitfinex.")
+        };
     }
 
     private static CandleResponse Map(JsonElement[] row)

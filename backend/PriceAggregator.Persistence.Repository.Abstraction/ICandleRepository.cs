@@ -9,12 +9,14 @@ public interface ICandleRepository
         long startUnixTime,
         long endUnixTime,
         SourceType sourceType,
+        InstrumentType instrumentType,
         CancellationToken cancellationToken = default);
 
     Task AddAsync(
         long startUnixTime,
         long endUnixTime,
         SourceType sourceType,
+        InstrumentType instrumentType,
         decimal priceOpen,
         decimal priceClose,
         decimal priceHigh,

@@ -6,6 +6,7 @@ namespace PriceAggregator.API.Services.Abstractions;
 public interface ICandleProvider
 {
     Task<IReadOnlyList<CandleDto>> GetCandlesAsync(
+        InstrumentType instrumentType,
         long unixTimeStart,
         long unixTimeEnd,
         IReadOnlyCollection<SourceType> sourceTypes,

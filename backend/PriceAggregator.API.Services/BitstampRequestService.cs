@@ -15,13 +15,14 @@ public class BitstampRequestService(
     public SourceType SourceType { get; } = SourceType.Bitstamp;
 
     public async Task<CandleResponse> GetPriceAsync(
+        InstrumentType instrumentType,
         long unixTimeStart,
         long unixTimeEnd,
         CancellationToken cancellationToken)
     {
         using var client = _httpClientFactory.CreateClient(nameof(BitstampRequestService));
 
-        var url = $"api/v2/ohlc/btcusd/?step=3600&limit=1&start={unixTimeStart / 1000}";
+        var url = $"api/v2/ohlc/{GetPair(instrumentType)}/?step=3600&limit=1&start={unixTimeStart / 1000}";
 
         using var response = await client.GetAsync(url, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -34,6 +35,16 @@ public class BitstampRequestService(
         }
 
         return Map(candle);
+    }
+
+    private static string GetPair(InstrumentType instrumentType)
+    {
+        return instrumentType switch
+        {
+            InstrumentType.BtcUsd => "btcusd",
+            InstrumentType.EthUsd => "ethusd",
+            _ => throw new NotSupportedException($"Instrument '{instrumentType}' is not supported by Bitstamp.")
+        };
     }
 
     private static CandleResponse Map(OhlcItem item)

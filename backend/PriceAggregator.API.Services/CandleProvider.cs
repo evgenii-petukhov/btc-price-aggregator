@@ -16,6 +16,7 @@ public class CandleProvider(
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<IReadOnlyList<CandleDto>> GetCandlesAsync(
+        InstrumentType instrumentType,
         long unixTimeStart,
         long unixTimeEnd,
         IReadOnlyCollection<SourceType> sourceTypes,
@@ -30,6 +31,7 @@ public class CandleProvider(
                 unixTimeStart,
                 unixTimeEnd,
                 sourceType,
+                instrumentType,
                 cancellationToken);
 
             if (candleEntity == null)
@@ -53,7 +55,7 @@ public class CandleProvider(
         if (missing.Count > 0)
         {
             var responses = await Task.WhenAll(
-                missing.Select(t => ResolveRequestService(t).GetPriceAsync(unixTimeStart, unixTimeEnd, cancellationToken)));
+                missing.Select(t => ResolveRequestService(t).GetPriceAsync(instrumentType, unixTimeStart, unixTimeEnd, cancellationToken)));
 
             for (var i = 0; i < missing.Count; i++)
             {
@@ -64,6 +66,7 @@ public class CandleProvider(
                     unixTimeStart,
                     unixTimeEnd,
                     sourceType,
+                    instrumentType,
                     candleResponse.PriceOpen,
                     candleResponse.PriceClose,
                     candleResponse.PriceHigh,
