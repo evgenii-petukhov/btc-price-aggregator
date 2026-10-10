@@ -4,5 +4,7 @@ namespace PriceAggregator.API.Services.Abstractions;
 
 public interface IPriceService
 {
-    public Task<PriceDto> GetPriceAsync(DateTime date, CancellationToken cancellationToken);
+    public Task<PriceSummaryDto> GetPriceAsync(
+        DateTime date,
+        CancellationToken cancellationToken);
 }

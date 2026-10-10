@@ -1,18 +1,22 @@
 using PriceAggregator.API.Services.Abstractions;
 using PriceAggregator.API.Services.Abstractions.Models;
 using PriceAggregator.API.Services.Models;
+using PriceAggregator.Persistence.Enums;
 using System.Globalization;
 using System.Net.Http.Json;
 
 namespace PriceAggregator.API.Services;
 
 public class BitstampRequestService(
-    IHttpClientFactory httpClientFactory) : IBitstampRequestService
+    IHttpClientFactory httpClientFactory) : IRequestService
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
+    public SourceType SourceType { get; } = SourceType.Bitstamp;
+
     public async Task<CandleResponse> GetPriceAsync(
         long unixTimeStart,
+        long unixTimeEnd,
         CancellationToken cancellationToken)
     {
         using var client = _httpClientFactory.CreateClient(nameof(BitstampRequestService));

@@ -1,14 +1,17 @@
 using PriceAggregator.API.Services.Abstractions;
 using PriceAggregator.API.Services.Abstractions.Models;
+using PriceAggregator.Persistence.Enums;
 using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace PriceAggregator.API.Services;
 
 public class BitfinexRequestService(
-    IHttpClientFactory httpClientFactory) : IBitfinexRequestService
+    IHttpClientFactory httpClientFactory) : IRequestService
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+
+    public SourceType SourceType { get; } = SourceType.Bitfinex;
 
     public async Task<CandleResponse> GetPriceAsync(
         long unixTimeStart,

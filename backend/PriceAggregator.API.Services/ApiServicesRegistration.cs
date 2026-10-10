@@ -13,9 +13,10 @@ public static class ApiServicesRegistration
         IConfiguration configuration)
     {
         services.AddScoped<IPriceService, PriceService>();
-        services.AddScoped<IBitfinexRequestService, BitfinexRequestService>();
-        services.AddScoped<IBitstampRequestService, BitstampRequestService>();
-        services.AddScoped<IBitstampService, BitstampService>();
+        services.AddScoped<IRequestService, BitfinexRequestService>();
+        services.AddScoped<IRequestService, BitstampRequestService>();
+        services.AddScoped<IRequestServiceResolver, RequestServiceResolver>();
+        services.AddScoped<IRequestCacheService, RequestCacheService>();
         services.AddSingleton<IUnixTimeRangeCalculator, UnixTimeRangeCalculator>();
         services.AddHttpClient(
             nameof(BitstampRequestService),

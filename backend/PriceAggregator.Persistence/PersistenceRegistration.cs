@@ -16,7 +16,12 @@ public static class PersistenceRegistration
             throw new InvalidOperationException("Connection string 'PricesDb' is not configured.");
         }
 
-        services.AddDbContext<PricesDbContext>(options => options.UseSqlite(connectionString));
+        services.AddDbContext<PricesDbContext>(options =>
+        {
+            options
+                .UseSqlite(connectionString)
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        });
         return services;
     }
 }

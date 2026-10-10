@@ -1,31 +1,34 @@
 using PriceAggregator.API.Models.Dtos;
 using PriceAggregator.API.Services.Abstractions;
+using PriceAggregator.Persistence.Enums;
 
 namespace PriceAggregator.API.Services;
 
 public class PriceService(
-    IBitfinexRequestService bitfinexRequestService,
-    IBitstampService bitstampService,
+    IRequestCacheService requestCacheService,
     IUnixTimeRangeCalculator unixTimeRangeCalculator) : IPriceService
 {
-    private readonly IBitfinexRequestService _bitfinexRequestService = bitfinexRequestService;
-    private readonly IBitstampService _bitstampService = bitstampService;
+    private readonly IRequestCacheService _requestCacheService = requestCacheService;
     private readonly IUnixTimeRangeCalculator _unixTimeRangeCalculator = unixTimeRangeCalculator;
 
-    public async Task<PriceDto> GetPriceAsync(DateTime date, CancellationToken cancellationToken)
+    public async Task<PriceSummaryDto> GetPriceAsync(
+        DateTime date,
+        CancellationToken cancellationToken)
     {
         var (start, end) = _unixTimeRangeCalculator.GetRange(date);
 
-        var bitfinexResponse = _bitfinexRequestService.GetPriceAsync(start, end, cancellationToken);
-        var bitstampResponse = _bitstampService.GetPriceAsync(start, end, cancellationToken);
+        var sourceTypes = Enum.GetValues<SourceType>();
 
-        await Task.WhenAll(bitfinexResponse, bitstampResponse);
+        var candles = await _requestCacheService.GetPricesAsync(start, end, sourceTypes, cancellationToken);
 
-        return new PriceDto
+        return new PriceSummaryDto
         {
-            BitfinexPrice = bitfinexResponse.Result.PriceClose,
-            BitstampPrice = bitstampResponse.Result.PriceClose,
-            Date = DateTime.UnixEpoch.AddSeconds(start / 1000)
+            Date = DateTime.UnixEpoch.AddSeconds(start / 1000),
+            Prices = candles.Select((candle, index) => new PriceItemDto
+            {
+                Price = candle.PriceClose,
+                SourceName = sourceTypes[index].ToString()
+            })
         };
     }
 }

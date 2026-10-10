@@ -12,7 +12,7 @@ public class PriceController(
     private readonly IPriceService _priceService = priceService;
 
     [HttpGet]
-    public async Task<ActionResult<PriceDto>> GetAsync(DateTime date, CancellationToken cancellationToken)
+    public async Task<ActionResult<PriceSummaryDto>> GetAsync(DateTime date, CancellationToken cancellationToken)
     {
         var result = await _priceService.GetPriceAsync(date, cancellationToken);
         return Ok(result);

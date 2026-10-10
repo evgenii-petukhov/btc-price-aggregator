@@ -1,9 +1,12 @@
 ﻿using PriceAggregator.API.Services.Abstractions.Models;
+using PriceAggregator.Persistence.Enums;
 
 namespace PriceAggregator.API.Services.Abstractions;
 
-public interface IBitfinexRequestService
+public interface IRequestService
 {
+    SourceType SourceType { get; }
+
     Task<CandleResponse> GetPriceAsync(
         long unixTimeStart,
         long unixTimeEnd,

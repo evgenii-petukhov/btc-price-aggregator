@@ -12,7 +12,7 @@ public class Candle
 
     public long EndUnixTime { get; set; }
 
-    public SourceTypes SourceType { get; set; }
+    public SourceType SourceType { get; set; }
 
     public decimal PriceOpen { get; set; }
 

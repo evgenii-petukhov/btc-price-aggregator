@@ -12,7 +12,7 @@ public class CandleRepository(PricesDbContext context) : ICandleRepository
     public Task<Candle?> GetAsync(
         long startUnixTime,
         long endUnixTime,
-        SourceTypes sourceType,
+        SourceType sourceType,
         CancellationToken cancellationToken = default)
     {
         return _context.Candles.FirstOrDefaultAsync(
@@ -23,7 +23,7 @@ public class CandleRepository(PricesDbContext context) : ICandleRepository
     public async Task AddAsync(
         long startUnixTime,
         long endUnixTime,
-        SourceTypes sourceType,
+        SourceType sourceType,
         decimal priceOpen,
         decimal priceClose,
         decimal priceHigh,

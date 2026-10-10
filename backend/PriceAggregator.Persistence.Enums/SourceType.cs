@@ -1,6 +1,6 @@
 ﻿namespace PriceAggregator.Persistence.Enums;
 
-public enum SourceTypes
+public enum SourceType
 {
     Bitstamp = 1,
     Bitfinex = 2

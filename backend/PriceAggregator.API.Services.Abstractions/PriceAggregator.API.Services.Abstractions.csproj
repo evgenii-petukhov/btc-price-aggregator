@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PriceAggregator.API.Models.Dtos\PriceAggregator.API.Models.Dtos.csproj" />
+    <ProjectReference Include="..\PriceAggregator.Persistence.Enums\PriceAggregator.Persistence.Enums.csproj" />
   </ItemGroup>
 
 </Project>

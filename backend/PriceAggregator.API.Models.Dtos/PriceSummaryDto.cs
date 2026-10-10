@@ -1,12 +1,10 @@
 ﻿namespace PriceAggregator.API.Models.Dtos;
 
-public class PriceDto
+public class PriceSummaryDto
 {
     public DateTime Date { get; set; }
 
     public bool IsCached { get; set; }
 
-    public decimal BitstampPrice { get; set; }
-
-    public decimal BitfinexPrice { get; set; }
+    public IEnumerable<PriceItemDto>? Prices {  get; set; }
 }
