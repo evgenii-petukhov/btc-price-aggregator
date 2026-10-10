@@ -2,7 +2,7 @@
 
 namespace PriceAggregator.API.Services.Abstractions;
 
-public interface IBitfinexService
+public interface IBitfinexRequestService
 {
     Task<Candle> GetPriceAsync(
         long unixTimeStart,

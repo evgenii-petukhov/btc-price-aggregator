@@ -9,17 +9,17 @@ public static class ApiServicesRegistration
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
         services.AddScoped<IPriceService, PriceService>();
-        services.AddScoped<IBitfinexService, BitfinexService>();
-        services.AddScoped<IBitstampService, BitstampService>();
+        services.AddScoped<IBitfinexRequestService, BitfinexRequestService>();
+        services.AddScoped<IBitstampRequestService, BitstampRequestService>();
         services.AddSingleton<IUnixTimeRangeCalculator, UnixTimeRangeCalculator>();
         services.AddHttpClient(
-            nameof(BitstampService),
+            nameof(BitstampRequestService),
             client =>
             {
                 client.BaseAddress = new Uri("https://www.bitstamp.net/");
             });
         services.AddHttpClient(
-            nameof(BitfinexService),
+            nameof(BitfinexRequestService),
             client =>
             {
                 client.BaseAddress = new Uri("https://api-pub.bitfinex.com/");

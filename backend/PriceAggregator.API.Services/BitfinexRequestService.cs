@@ -5,8 +5,8 @@ using System.Text.Json;
 
 namespace PriceAggregator.API.Services;
 
-public class BitfinexService(
-    IHttpClientFactory httpClientFactory) : IBitfinexService
+public class BitfinexRequestService(
+    IHttpClientFactory httpClientFactory) : IBitfinexRequestService
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
@@ -15,7 +15,7 @@ public class BitfinexService(
         long unixTimeEnd,
         CancellationToken cancellationToken)
     {
-        using var client = _httpClientFactory.CreateClient(nameof(BitfinexService));
+        using var client = _httpClientFactory.CreateClient(nameof(BitfinexRequestService));
 
         var url = $"v2/candles/trade:1h:tBTCUSD/hist?start={unixTimeStart}&end={unixTimeEnd}&limit=1&sort=1";
 

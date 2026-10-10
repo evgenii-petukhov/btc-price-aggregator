@@ -3,12 +3,11 @@ using PriceAggregator.API.Services.Abstractions.Models;
 using PriceAggregator.API.Services.Models;
 using System.Globalization;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 
 namespace PriceAggregator.API.Services;
 
-public class BitstampService(
-    IHttpClientFactory httpClientFactory) : IBitstampService
+public class BitstampRequestService(
+    IHttpClientFactory httpClientFactory) : IBitstampRequestService
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
@@ -16,7 +15,7 @@ public class BitstampService(
         long unixTimeStart,
         CancellationToken cancellationToken)
     {
-        using var client = _httpClientFactory.CreateClient(nameof(BitstampService));
+        using var client = _httpClientFactory.CreateClient(nameof(BitstampRequestService));
 
         var url = $"api/v2/ohlc/btcusd/?step=3600&limit=1&start={unixTimeStart}";
 

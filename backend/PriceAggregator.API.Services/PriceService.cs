@@ -4,12 +4,12 @@ using PriceAggregator.API.Services.Abstractions;
 namespace PriceAggregator.API.Services;
 
 public class PriceService(
-    IBitfinexService bitfinexService,
-    IBitstampService bitstampService,
+    IBitfinexRequestService bitfinexRequestService,
+    IBitstampRequestService bitstampRequestService,
     IUnixTimeRangeCalculator unixTimeRangeCalculator) : IPriceService
 {
-    private readonly IBitfinexService _bitfinexService = bitfinexService;
-    private readonly IBitstampService _bitstampService = bitstampService;
+    private readonly IBitfinexRequestService _bitfinexRequestService = bitfinexRequestService;
+    private readonly IBitstampRequestService _bitstampRequestService = bitstampRequestService;
     private readonly IUnixTimeRangeCalculator _unixTimeRangeCalculator = unixTimeRangeCalculator;
 
     public async Task<PriceDto> GetPriceAsync(DateTime date, CancellationToken cancellationToken)
@@ -17,8 +17,8 @@ public class PriceService(
         var (start, end) = _unixTimeRangeCalculator.GetRange(date);
         var bitstampStart = _unixTimeRangeCalculator.GetHourStartInSeconds(date);
 
-        var bitfinexResponse = _bitfinexService.GetPriceAsync(start, end, cancellationToken);
-        var bitstampResponse = _bitstampService.GetPriceAsync(bitstampStart, cancellationToken);
+        var bitfinexResponse = _bitfinexRequestService.GetPriceAsync(start, end, cancellationToken);
+        var bitstampResponse = _bitstampRequestService.GetPriceAsync(bitstampStart, cancellationToken);
 
         await Task.WhenAll(bitfinexResponse, bitstampResponse);
 
