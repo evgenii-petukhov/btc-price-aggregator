@@ -3,9 +3,9 @@ using PriceAggregator.Persistence.Enums;
 
 namespace PriceAggregator.API.Services.Abstractions;
 
-public interface IRequestCacheService
+public interface ICandleProvider
 {
-    Task<IReadOnlyList<CandleDto>> GetPricesAsync(
+    Task<IReadOnlyList<CandleDto>> GetCandlesAsync(
         long unixTimeStart,
         long unixTimeEnd,
         IReadOnlyCollection<SourceType> sourceTypes,

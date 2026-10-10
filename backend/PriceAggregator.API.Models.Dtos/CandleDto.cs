@@ -13,4 +13,6 @@ public class CandleDto
     public decimal PriceLow { get; set; }
 
     public decimal Volume { get; set; }
+
+    public bool IsCached { get; set; }
 }

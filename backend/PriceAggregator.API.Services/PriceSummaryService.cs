@@ -4,14 +4,14 @@ using PriceAggregator.Persistence.Enums;
 
 namespace PriceAggregator.API.Services;
 
-public class PriceService(
-    IRequestCacheService requestCacheService,
-    IUnixTimeRangeCalculator unixTimeRangeCalculator) : IPriceService
+public class PriceSummaryService(
+    ICandleProvider candleProvider,
+    IUnixTimeRangeCalculator unixTimeRangeCalculator) : IPriceSummaryService
 {
-    private readonly IRequestCacheService _requestCacheService = requestCacheService;
+    private readonly ICandleProvider _candleProvider = candleProvider;
     private readonly IUnixTimeRangeCalculator _unixTimeRangeCalculator = unixTimeRangeCalculator;
 
-    public async Task<PriceSummaryDto> GetPriceAsync(
+    public async Task<PriceSummaryDto> GetSummaryAsync(
         DateTime date,
         CancellationToken cancellationToken)
     {
@@ -19,7 +19,7 @@ public class PriceService(
 
         var sourceTypes = Enum.GetValues<SourceType>();
 
-        var candles = await _requestCacheService.GetPricesAsync(start, end, sourceTypes, cancellationToken);
+        var candles = await _candleProvider.GetCandlesAsync(start, end, sourceTypes, cancellationToken);
 
         return new PriceSummaryDto
         {
@@ -28,7 +28,8 @@ public class PriceService(
             {
                 Price = candle.PriceClose,
                 SourceName = sourceTypes[index].ToString()
-            })
+            }),
+            IsCached = candles.All(c => c.IsCached),
         };
     }
 }

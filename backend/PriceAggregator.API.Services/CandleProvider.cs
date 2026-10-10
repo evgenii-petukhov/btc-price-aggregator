@@ -6,16 +6,16 @@ using PriceAggregator.Persistence.Repository.Abstraction;
 
 namespace PriceAggregator.API.Services;
 
-public class RequestCacheService(
+public class CandleProvider(
     IRequestServiceResolver requestServiceResolver,
     ICandleRepository repository,
-    IUnitOfWork unitOfWork) : IRequestCacheService
+    IUnitOfWork unitOfWork) : ICandleProvider
 {
     private readonly IRequestServiceResolver _requestServiceResolver = requestServiceResolver;
     private readonly ICandleRepository _repository = repository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<IReadOnlyList<CandleDto>> GetPricesAsync(
+    public async Task<IReadOnlyList<CandleDto>> GetCandlesAsync(
         long unixTimeStart,
         long unixTimeEnd,
         IReadOnlyCollection<SourceType> sourceTypes,
@@ -45,7 +45,8 @@ public class RequestCacheService(
                 PriceClose = candleEntity.PriceClose,
                 PriceHigh = candleEntity.PriceHigh,
                 PriceLow = candleEntity.PriceLow,
-                Volume = candleEntity.Volume
+                Volume = candleEntity.Volume,
+                IsCached = true
             };
         }
 

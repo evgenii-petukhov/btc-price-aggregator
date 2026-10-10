@@ -7,14 +7,14 @@ namespace PriceAggregator.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class PriceController(
-    IPriceService priceService) : ControllerBase
+    IPriceSummaryService priceSummaryService) : ControllerBase
 {
-    private readonly IPriceService _priceService = priceService;
+    private readonly IPriceSummaryService _priceSummaryService = priceSummaryService;
 
     [HttpGet]
     public async Task<ActionResult<PriceSummaryDto>> GetAsync(DateTime date, CancellationToken cancellationToken)
     {
-        var result = await _priceService.GetPriceAsync(date, cancellationToken);
+        var result = await _priceSummaryService.GetSummaryAsync(date, cancellationToken);
         return Ok(result);
     }
 }
