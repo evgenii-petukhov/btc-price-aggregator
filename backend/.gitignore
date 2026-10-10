@@ -480,3 +480,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Angular build output (npm run build in frontend/)
+PriceAggregator.API/wwwroot/

@@ -75,7 +75,7 @@ export class App {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(toErrorMessage(err, API_URL));
+                this.error.set(toErrorMessage(err, API_URL || location.origin));
                 this.loading.set(false);
             },
         });
