@@ -1,6 +1,6 @@
-namespace PriceAggregator.API.Services.Abstractions.Models;
+﻿namespace PriceAggregator.API.Models.Dtos;
 
-public class Candle
+public class CandleDto
 {
     public long UnitTimeStart { get; set; }
 

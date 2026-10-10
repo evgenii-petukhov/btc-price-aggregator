@@ -4,7 +4,7 @@ namespace PriceAggregator.API.Services.Abstractions;
 
 public interface IBitstampRequestService
 {
-    Task<Candle> GetPriceAsync(
+    Task<CandleResponse> GetPriceAsync(
         long unixTimeStart,
         CancellationToken cancellationToken);
 }

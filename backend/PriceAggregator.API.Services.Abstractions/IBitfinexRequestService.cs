@@ -4,7 +4,7 @@ namespace PriceAggregator.API.Services.Abstractions;
 
 public interface IBitfinexRequestService
 {
-    Task<Candle> GetPriceAsync(
+    Task<CandleResponse> GetPriceAsync(
         long unixTimeStart,
         long unixTimeEnd,
         CancellationToken cancellationToken);

@@ -15,11 +15,6 @@ public class UnixTimeRangeCalculator : IUnixTimeRangeCalculator
         return (start, start + HourInMilliseconds - 1);
     }
 
-    public long GetHourStartInSeconds(DateTime date)
-    {
-        return (long)(TruncateToHour(ToUtc(date)) - Origin).TotalSeconds;
-    }
-
     private static DateTime ToUtc(DateTime date)
     {
         return date.Kind == DateTimeKind.Unspecified

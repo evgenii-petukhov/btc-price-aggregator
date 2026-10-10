@@ -35,9 +35,7 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
 });
 
-builder.Services.AddApiServices();
-
-builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddApiServices(builder.Configuration);
 
 var app = builder.Build();
 

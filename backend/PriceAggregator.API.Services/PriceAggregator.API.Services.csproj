@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PriceAggregator.API.Services.Abstractions\PriceAggregator.API.Services.Abstractions.csproj" />
+    <ProjectReference Include="..\PriceAggregator.Persistence.Repository\PriceAggregator.Persistence.Repository.csproj" />
   </ItemGroup>
 
 </Project>

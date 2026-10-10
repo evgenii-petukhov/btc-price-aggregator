@@ -10,7 +10,7 @@ public class BitfinexRequestService(
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
-    public async Task<Candle> GetPriceAsync(
+    public async Task<CandleResponse> GetPriceAsync(
         long unixTimeStart,
         long unixTimeEnd,
         CancellationToken cancellationToken)
@@ -31,9 +31,9 @@ public class BitfinexRequestService(
         return Map(candles[0]);
     }
 
-    private static Candle Map(JsonElement[] row)
+    private static CandleResponse Map(JsonElement[] row)
     {
-        return new Candle
+        return new CandleResponse
         {
             UnitTimeStart = row[0].GetInt64(),
             PriceOpen = row[1].GetDecimal(),
