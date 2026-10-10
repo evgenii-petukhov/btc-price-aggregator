@@ -21,6 +21,7 @@
     <ProjectReference Include="..\PriceAggregator.API.Models.Dtos\PriceAggregator.API.Models.Dtos.csproj" />
     <ProjectReference Include="..\PriceAggregator.API.Services.Abstractions\PriceAggregator.API.Services.Abstractions.csproj" />
     <ProjectReference Include="..\PriceAggregator.API.Services\PriceAggregator.API.Services.csproj" />
+    <ProjectReference Include="..\PriceAggregator.Persistence\PriceAggregator.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
